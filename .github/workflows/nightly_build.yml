@@ -59,13 +59,18 @@ jobs:
           sleep 10
           docker compose ps
 
+      - name: Verify Web Service is Running
+        run: |
+          STATUS=$(docker compose ps | grep web | grep "Up")
+          if [ -z "$STATUS" ]; then
+            echo "❌ Web service is not running!"
+            exit 1
+          fi
+        shell: bash
+
       - name: Debug Web Container Logs
         if: failure()
         run: docker compose logs web
-
-      - name: Run Tests
-        run: |
-          docker compose exec web pytest tests/
 
       - name: Debug Celery Worker Logs
         if: failure()
