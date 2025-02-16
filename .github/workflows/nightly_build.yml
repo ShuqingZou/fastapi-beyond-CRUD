@@ -69,6 +69,14 @@ jobs:
             echo "Error: src/mail.py not found!"
             exit 1
           fi
+          
+      - name: Debug Environment Variables (Check SMTP Config)
+        run: |
+          echo "MAIL_SERVER=${{ secrets.MAIL_SERVER }}"
+          echo "MAIL_PORT=${{ secrets.MAIL_PORT }}"
+          echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}"
+          echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}"
+          echo "MAIL_FROM=${{ secrets.MAIL_FROM }}"
 
       - name: Notify Build Result
         env:
@@ -79,7 +87,7 @@ jobs:
           MAIL_FROM: ${{ secrets.MAIL_FROM }}
         run: |
           chmod +x src/mail.py
-          if [ ${{ job.status }} == "success" ]; then
+          if [[ "${{ job.status }}" == "success" ]]; then
             python3 src/mail.py "Nightly Build Succeeded" "The nightly build completed successfully. Everything is working!" "bryana.fay71@ethereal.email"
           else
             python3 src/mail.py "Nightly Build Failed" "The build and start process failed. Please check logs." "bryana.fay71@ethereal.email"
