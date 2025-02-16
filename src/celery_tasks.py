@@ -1,16 +1,11 @@
 from celery import Celery
-from src.mail import mail, create_message
-from asgiref.sync import async_to_sync
+from src.mail import send_email
 
 c_app = Celery()
-
 c_app.config_from_object("src.config")
 
-
 @c_app.task()
-def send_email(recipients: list[str], subject: str, body: str):
-
-    message = create_message(recipients=recipients, subject=subject, body=body)
-
-    async_to_sync(mail.send_message)(message)
-    print("Email sent")
+def send_email_task(recipients: list[str], subject: str, body: str):
+    for recipient in recipients:
+        send_email(subject=subject, content=body, recipient=recipient)
+    print("Emails sent")

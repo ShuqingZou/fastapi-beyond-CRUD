@@ -20,7 +20,6 @@ def send_email(subject: str, content: str, recipient: str):
         print("❌ Error: One or more environment variables are missing!")
         return
 
-    # 创建邮件内容
     message = MIMEMultipart()
     message["From"] = sender_email
     message["To"] = recipient
