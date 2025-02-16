@@ -49,7 +49,7 @@ jobs:
         run: |
           docker compose up -d
           sleep 10
-          docker-compose exec web pytest tests/
+          docker compose exec web pytest tests/
         env:
           DATABASE_URL: "postgresql://postgres:testpass@db:5432/bookly"
 
