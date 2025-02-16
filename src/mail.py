@@ -2,6 +2,7 @@ import os
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import sys
 
 def send_email(subject: str, content: str, recipient: str):
     smtp_server = os.getenv("MAIL_SERVER", "").strip()
