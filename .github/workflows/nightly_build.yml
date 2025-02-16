@@ -49,13 +49,19 @@ jobs:
           echo "MAIL_FROM_NAME=BryanaFay" >> .env
           echo "DOMAIN=http://localhost:8000" >> .env
 
+      - name: Print environment variables (Debugging)
+        run: cat .env
+
       - name: Run Tests
         run: |
-          docker compose up -d
+          docker compose up -d --env-file .env
           sleep 10
+          docker compose ps
           docker compose exec web pytest tests/
-        env:
-          DATABASE_URL: "postgresql://postgres:testpass@db:5432/bookly"
+
+      - name: Debug Web Container Logs
+        if: failure()
+        run: docker compose logs web
 
       - name: Check if mail.py exists
         run: |
