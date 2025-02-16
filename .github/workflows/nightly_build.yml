@@ -47,5 +47,5 @@ jobs:
       - name: Notify if tests fail
         if: failure()
         run: |
-          chmod +x ./src/mail.py
-          python3 ./src/mail.py "Nightly Build Failed" "Your nightly build has failed. Please check logs." "bryana.fay71@ethereal.email"
+          chmod +x src/mail.py
+          python3 src/mail.py "Nightly Build Failed" "Your nightly build has failed. Please check logs." "bryana.fay71@ethereal.email"
