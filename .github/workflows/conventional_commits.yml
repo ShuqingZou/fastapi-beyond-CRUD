@@ -23,3 +23,15 @@ jobs:
           gh pr close ${{ github.event.pull_request.number }} --comment "This PR was closed because the commit message does not follow the Conventional Commits specification."
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify PR Closure
+        if: failure()
+        env:
+          MAIL_SERVER: ${{ secrets.MAIL_SERVER }}
+          MAIL_PORT: ${{ secrets.MAIL_PORT }}
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+        run: |
+          chmod +x src/mail.py
+          python3 src/mail.py "PR Closed Due to Invalid Commit Message" "This PR was closed because the commit message does not follow the Conventional Commits specification. Please update your commit message and try again." "bryana.fay71@ethereal.email"
