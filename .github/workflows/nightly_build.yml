@@ -54,7 +54,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          docker compose up -d --env-file .env
+          docker compose up -d
           sleep 10
           docker compose ps
           docker compose exec web pytest tests/
