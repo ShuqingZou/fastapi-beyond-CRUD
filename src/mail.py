@@ -37,8 +37,12 @@ def send_email(subject: str, content: str, recipient: str):
         print(f"❌ Failed to send email: {str(e)}")
 
 if __name__ == "__main__":
-    send_email(
-        "Test Email from Ethereal",
-        "This is a test email sent using Ethereal SMTP.",
-        "test-recipient@example.com"
-    )
+    if len(sys.argv) != 4:
+        print("Usage: python3 mail.py <subject> <content> <recipient>")
+        sys.exit(1)
+
+    subject = sys.argv[1]
+    content = sys.argv[2]
+    recipient = sys.argv[3]
+
+    send_email(subject, content, recipient)
