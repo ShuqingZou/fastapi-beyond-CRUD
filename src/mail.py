@@ -1,32 +1,45 @@
-from fastapi_mail import FastMail, ConnectionConfig, MessageSchema, MessageType
-from src.config import Config
-from pathlib import Path
+import os
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
-BASE_DIR = Path(__file__).resolve().parent
-
-
-mail_config = ConnectionConfig(
-    MAIL_USERNAME=Config.MAIL_USERNAME,
-    MAIL_PASSWORD=Config.MAIL_PASSWORD,
-    MAIL_FROM=Config.MAIL_FROM,
-    MAIL_PORT=587,
-    MAIL_SERVER=Config.MAIL_SERVER,
-    MAIL_FROM_NAME=Config.MAIL_FROM_NAME,
-    MAIL_STARTTLS=True,
-    MAIL_SSL_TLS=False,
-    USE_CREDENTIALS=True,
-    VALIDATE_CERTS=True,
-    # TEMPLATE_FOLDER=Path(BASE_DIR, "templates"),
-)
+def send_email(subject: str, content: str, recipient: str):
+    smtp_server = os.getenv("MAIL_SERVER", "").strip()
+    smtp_port = int(os.getenv("MAIL_PORT", 587))
+    smtp_username = os.getenv("MAIL_USERNAME", "").strip()
+    smtp_password = os.getenv("MAIL_PASSWORD", "").strip()
+    sender_email = os.getenv("MAIL_FROM", "").strip()
 
 
-mail = FastMail(config=mail_config)
+    print(f"SMTP Server: '{smtp_server}'")
+    print(f"SMTP Port: '{smtp_port}'")
+    print(f"SMTP Username: '{smtp_username}'")
 
 
-def create_message(recipients: list[str], subject: str, body: str):
+    if not smtp_server or not smtp_username or not smtp_password or not sender_email:
+        print("❌ Error: One or more environment variables are missing!")
+        return
 
-    message = MessageSchema(
-        recipients=recipients, subject=subject, body=body, subtype=MessageType.html
+    # 创建邮件内容
+    message = MIMEMultipart()
+    message["From"] = sender_email
+    message["To"] = recipient
+    message["Subject"] = subject
+    message.attach(MIMEText(content, "plain"))
+
+    try:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(smtp_username, smtp_password)
+        server.sendmail(sender_email, recipient, message.as_string())
+        server.quit()
+        print("✅ Email sent successfully!")
+    except Exception as e:
+        print(f"❌ Failed to send email: {str(e)}")
+
+if __name__ == "__main__":
+    send_email(
+        "Test Email from Ethereal",
+        "This is a test email sent using Ethereal SMTP.",
+        "test-recipient@example.com"
     )
-
-    return message

@@ -1,0 +1,25 @@
+name: Conventional Commit Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  check-commits:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Validate Commit Message
+        uses: wagoid/commitlint-github-action@v5
+        with:
+          configFile: commitlint.config.js
+
+      - name: Close PR if invalid
+        if: failure()
+        run: |
+          gh pr close ${{ github.event.pull_request.number }} --comment "This PR was closed because the commit message does not follow the Conventional Commits specification."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
