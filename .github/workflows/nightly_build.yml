@@ -24,8 +24,8 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t your-dockerhub-username/fastapi-app:latest .
-          docker push your-dockerhub-username/fastapi-app:latest
+          docker build -t shuqingzou/fastapi-app:latest .
+          docker push shuqingzou/fastapi-app:latest
 
   tests:
     runs-on: ubuntu-latest
@@ -44,4 +44,4 @@ jobs:
       - name: Notify if tests fail
         if: failure()
         run: |
-          curl -X POST -H "Content-Type: application/json" -d '{"email":"your-email@example.com", "message":"Nightly build failed!"}' https://your-notification-service.com/send
+          python3 src/mail.py "Nightly Build Failed" "Your nightly build has failed. Please check logs." "bryana.fay71@ethereal.email"
