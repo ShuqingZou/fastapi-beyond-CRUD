@@ -35,15 +35,19 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Check Docker Compose Version
-        run: docker compose version || echo "docker compose not found"
-
-      - name: Install Docker Compose if missing
+      - name: Create .env file
         run: |
-          if ! command -v docker-compose &> /dev/null && ! command -v docker compose &> /dev/null; then
-            sudo apt-get update
-            sudo apt-get install -y docker-compose
-          fi
+          echo "DATABASE_URL=postgresql://postgres:testpass@db:5432/bookly" >> .env
+          echo "JWT_SECRET=NMM3S-MBAVTGWggt0ISI_3NY9eebmMBBSi4hR_rwKko" >> .env
+          echo "JWT_ALGORITHM=HS256" >> .env
+          echo "REDIS_URL=redis://redis:6379/0" >> .env
+          echo "MAIL_USERNAME=bryana.fay71@ethereal.email" >> .env
+          echo "MAIL_PASSWORD=6XF4g3kB5xSBngJxBt" >> .env
+          echo "MAIL_SERVER=smtp.ethereal.email" >> .env
+          echo "MAIL_PORT=587" >> .env
+          echo "MAIL_FROM=bryana.fay71@ethereal.email" >> .env
+          echo "MAIL_FROM_NAME=BryanaFay" >> .env
+          echo "DOMAIN=http://localhost:8000" >> .env
 
       - name: Run Tests
         run: |
