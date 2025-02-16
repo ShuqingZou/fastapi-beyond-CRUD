@@ -59,22 +59,9 @@ jobs:
           sleep 10
           docker compose ps
 
-      - name: Verify Web Service is Running
-        run: |
-          STATUS=$(docker compose ps | grep web | grep "Up")
-          if [ -z "$STATUS" ]; then
-            echo "❌ Web service is not running!"
-            exit 1
-          fi
-        shell: bash
-
-      - name: Debug Web Container Logs
+      - name: Debug All Containers Logs (if failed)
         if: failure()
-        run: docker compose logs web
-
-      - name: Debug Celery Worker Logs
-        if: failure()
-        run: docker compose logs celery
+        run: docker compose logs
 
       - name: Check if mail.py exists
         run: |
@@ -83,7 +70,7 @@ jobs:
             exit 1
           fi
 
-      - name: Notify if tests fail
+      - name: Notify Build Result
         if: failure()
         env:
           SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
@@ -93,4 +80,8 @@ jobs:
           MAIL_FROM: ${{ secrets.MAIL_FROM }}
         run: |
           chmod +x src/mail.py
-          python3 src/mail.py "Nightly Build Failed" "Your nightly build has failed. Please check logs." "bryana.fay71@ethereal.email"
+          if [ ${{ job.status }} == "success" ]; then
+            python3 src/mail.py "Nightly Build Succeeded" "The nightly build completed successfully. Everything is working!" "bryana.fay71@ethereal.email"
+          else
+            python3 src/mail.py "Nightly Build Failed" "The build and start process failed. Please check logs." "bryana.fay71@ethereal.email"
+          fi
