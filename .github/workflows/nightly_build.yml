@@ -13,9 +13,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: List files in repository (Debugging)
-        run: ls -R
-
       - name: Set up Docker
         uses: docker/setup-buildx-action@v2
 
@@ -35,14 +32,33 @@ jobs:
     needs: build-and-push
 
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: List files in repository (Debugging)
+        run: ls -R
+
+      - name: Check if docker-compose.yml exists
+        run: |
+          if [ ! -f "docker-compose.yml" ]; then
+            echo "Error: docker-compose.yml not found!"
+            exit 1
+          fi
+
       - name: Run Tests
         run: |
           docker compose up -d
           sleep 10
           docker-compose exec web pytest tests/
-
         env:
           DATABASE_URL: "postgresql://postgres:testpass@db:5432/bookly"
+
+      - name: Check if mail.py exists
+        run: |
+          if [ ! -f "src/mail.py" ]; then
+            echo "Error: src/mail.py not found!"
+            exit 1
+          fi
 
       - name: Notify if tests fail
         if: failure()
