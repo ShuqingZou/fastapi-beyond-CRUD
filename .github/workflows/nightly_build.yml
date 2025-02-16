@@ -35,14 +35,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: List files in repository (Debugging)
-        run: ls -R
+      - name: Check Docker Compose Version
+        run: docker compose version || echo "docker compose not found"
 
-      - name: Check if docker-compose.yml exists
+      - name: Install Docker Compose if missing
         run: |
-          if [ ! -f "docker-compose.yml" ]; then
-            echo "Error: docker-compose.yml not found!"
-            exit 1
+          if ! command -v docker-compose &> /dev/null && ! command -v docker compose &> /dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y docker-compose
           fi
 
       - name: Run Tests
@@ -62,6 +62,12 @@ jobs:
 
       - name: Notify if tests fail
         if: failure()
+        env:
+          SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
         run: |
           chmod +x src/mail.py
           python3 src/mail.py "Nightly Build Failed" "Your nightly build has failed. Please check logs." "bryana.fay71@ethereal.email"
